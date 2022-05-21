@@ -23,4 +23,12 @@ describe('Testes da função getOpeningHours', () => {
     expect(getOpeningHours('Wednesday', '2:23-PM')).toBe('The zoo is open');
     expect(getOpeningHours('Tuesday', '8:23-AM')).toBe('The zoo is open');
   });
+  it('Testa se a função está pegando os errors apropriados', () => {
+    expect(() => getOpeningHours('Tuesday', '2:50-XM')).toThrow('The abbreviation must be \'AM\' or \'PM\'');
+    expect(() => getOpeningHours('Tuesday', 'a:50-PM')).toThrow('The hour should represent a number');
+    expect(() => getOpeningHours('Tuesday', '2:69-PM')).toThrow('The minutes must be between 0 and 59');
+    expect(() => getOpeningHours('Tuesday', '69:00-PM')).toThrow('The hour must be between 0 and 12');
+    expect(() => getOpeningHours('Mufasaday', '2:30-PM')).toThrow('The day must be valid. Example: Monday');
+    // expect(getOpeningHours('Tuesday', '8:23-AM')).toBe('The zoo is open');
+  });
 });
