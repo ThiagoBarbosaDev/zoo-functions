@@ -1,67 +1,72 @@
 const { species } = require('../data/zoo_data');
 const data = require('../data/zoo_data');
 
-const findSpeciesByLocation = (location) => species.filter((animal) => animal.location
-=== location);
+const locations = ['NE', 'NW', 'SE', 'SW'];
+const findSpeciesByLocation = (location) => species
+  .filter((animal) => animal.location === location);
 
-const animalMapByResidents = (obj) => (obj.map((animal) => ({
-  [animal.name]: animal.residents.map((animal2) => animal2.name),
-})));
+const returnAnimalNames = (location) => findSpeciesByLocation(location)
+  .map((animal) => animal.name);
 
-const mapAnimalsByResidents = {
-  NE: (animalMapByResidents(findSpeciesByLocation('NE'))),
-  NW: (animalMapByResidents(findSpeciesByLocation('NW'))),
-  SE: (animalMapByResidents(findSpeciesByLocation('SE'))),
-  SW: (animalMapByResidents(findSpeciesByLocation('SW'))),
-};
+let mapSpeciesObj = {};
 
-const animalMapByResidentsSorted = (obj) => (obj.map((animal) => ({
-  [animal.name]: animal.residents.map((animal2) => animal2.name).sort(),
-})));
-
-const mapAnimalsByResidentsSorted = {
-  NE: (animalMapByResidentsSorted(findSpeciesByLocation('NE'))),
-  NW: (animalMapByResidentsSorted(findSpeciesByLocation('NW'))),
-  SE: (animalMapByResidentsSorted(findSpeciesByLocation('SE'))),
-  SW: (animalMapByResidentsSorted(findSpeciesByLocation('SW'))),
-};
-
-const getArrayOfAnimal = (local) => (findSpeciesByLocation(local).map((animal) => animal.name));
-
-const animalMapSpecies = {
-  NE: getArrayOfAnimal('NE'),
-  NW: getArrayOfAnimal('NW'),
-  SE: getArrayOfAnimal('SE'),
-  SW: getArrayOfAnimal('SW'),
-};
-
-const filterBySex = (obj, sex) => (obj.map((animal) => ({
-  [animal.name]: animal.residents.filter((animal2) => animal2.sex === sex)
-    .map((animal2) => animal2.name),
-})));
-
-const filterBySexObj = (sex) => ({
-  NE: (filterBySex(findSpeciesByLocation('NE'), sex)),
-  NW: (filterBySex(findSpeciesByLocation('NW'), sex)),
-  SE: (filterBySex(findSpeciesByLocation('SE'), sex)),
-  SW: (filterBySex(findSpeciesByLocation('SW'), sex)),
+locations.forEach((location) => {
+  mapSpeciesObj = { ...mapSpeciesObj, [location]: returnAnimalNames(location) };
+  return mapSpeciesObj;
 });
 
-// console.log(filterBySexObj('male'))
+const mapResidents = (location) => findSpeciesByLocation(location)
+  .map((animal) => ({ [animal.name]: animal.residents.map((resident) => resident.name) }));
 
-const filterBySexSorted = (obj, sex) => (obj.map((animal) => ({
-  [animal.name]: animal.residents.filter((animal2) => animal2.sex === sex)
-    .map((animal2) => animal2.name).sort(),
-})));
+let mapResidentsObj = {};
 
-const filterBySexSortedObj = (sex) => ({
-  NE: (filterBySexSorted(findSpeciesByLocation('NE'), sex)),
-  NW: (filterBySexSorted(findSpeciesByLocation('NW'), sex)),
-  SE: (filterBySexSorted(findSpeciesByLocation('SE'), sex)),
-  SW: (filterBySexSorted(findSpeciesByLocation('SW'), sex)),
+locations.forEach((location) => {
+  mapResidentsObj = { ...mapResidentsObj, [location]: mapResidents(location) };
+  return mapResidentsObj;
 });
 
-console.log(filterBySexSortedObj('female').NE);
+let mapResidentsSortedObj = {};
+
+const mapResidentsSorted = (location) => findSpeciesByLocation(location)
+  .map((animal) => ({ [animal.name]: animal.residents.map((resident) => resident.name).sort() }));
+
+locations.forEach((location) => {
+  mapResidentsSortedObj = { ...mapResidentsSortedObj, [location]: mapResidentsSorted(location) };
+  return mapResidentsSortedObj;
+});
+
+let mapResidentsSex = {};
+
+const filterBySexInnerFunction = (obj, sex) => obj.residents
+  .filter(((resident) => resident.sex === sex))
+  .map((resident) => resident.name);
+
+const mapResidentsSexObj = (location, sex) => findSpeciesByLocation(location)
+  .map((animal) => ({ [animal.name]: filterBySexInnerFunction(animal, sex) }));
+
+const filterBySex2 = (sex) => {
+  locations.forEach((location) => {
+    mapResidentsSex = { ...mapResidentsSex, [location]: mapResidentsSexObj(location, sex) };
+    return mapResidentsSex;
+  });
+};
+
+let mapResidentsSexSortedObj = {};
+
+const filterBySexSortedInnerFunction = (obj, sex) => obj.residents
+  .filter(((resident) => resident.sex === sex)).map((resident) => resident.name).sort();
+
+const mapResidentsSortedSexObj = (location, sex) => findSpeciesByLocation(location)
+  .map((animal) => ({ [animal.name]: filterBySexSortedInnerFunction(animal, sex) }));
+
+const filterBySexSorted2 = (sex) => {
+  locations.forEach((location) => {
+    mapResidentsSexSortedObj = {
+      ...mapResidentsSexSortedObj, [location]: mapResidentsSortedSexObj(location, sex),
+    };
+    return mapResidentsSexSortedObj;
+  });
+};
 
 const isParamValid = (options) => {
   if (Object.keys(options).length === 0) { return true; }
@@ -75,26 +80,14 @@ const areAllTrue = (options) => options.includeNames && options.sex && options.s
 function getAnimalMap(options = {}) {
   // seu código aqui
   console.log(options);
-  if (isEmpty(options)) { console.log('FFF ou TFF'); return animalMapSpecies; }
-  if (areAllTrue(options)) { console.log('TTT'); return filterBySexSortedObj(options.sex); }
-  if (options.sex) { console.log('TTF'); return filterBySexObj(options.sex); }
-  if (options.sorted) { console.log('TFT'); return mapAnimalsByResidentsSorted; }
-  return mapAnimalsByResidents; // (TFF)
-  // return options;
+  if (isEmpty(options)) { console.log('FFF ou TFF'); return mapSpeciesObj; }
+  if (areAllTrue(options)) {
+    console.log('TTT'); filterBySexSorted2(options.sex);
+    return mapResidentsSexSortedObj;
+  }
+  if (options.sex) { console.log('TTF'); filterBySex2(options.sex); return mapResidentsSex; }
+  if (options.sorted) { console.log('TFT'); return mapResidentsSortedObj; }
+  return mapResidentsObj; // (TFF)
 }
-// console.log(Object.values(animalMapSpecies))
-// console.log(getAnimalMap());
-// console.log(animalMapSpecies); caso {}
-
-// console.log(getAnimalMap({ sex: 'female' }));
-// console.log(mapAnimalsByResidents.NE); //caso {sex: 'female}
-
-// console.log(mapAnimalsByResidentsSorted.NE)
-// console.log(getAnimalMap({ includeNames: true, sorted: true }));
-
-// console.log(getAnimalMap({ includeNames: true }));
-// console.log(getAnimalMap({ sorted: true, sex: 'female' }));
-// console.log(getAnimalMap({ includeNames: true, sex: 'female' }));
-// console.log(getAnimalMap({ includeNames: true, sex: 'female', sorted: true }));
 
 module.exports = getAnimalMap;
