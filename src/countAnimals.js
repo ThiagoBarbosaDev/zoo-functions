@@ -1,30 +1,21 @@
 const { species } = require('../data/zoo_data');
 const data = require('../data/zoo_data');
-// dúvida1 = pq meu linter reclama com a minha arrow function?
-// dúvida2 = pq meu reduce comentado na linha 10 nao functiona?
 
-function countAnimals(animal) {
-  // seu código aqui
-  if (typeof animal !== 'object') {
-    return species.reduce((acc, specie) => {
-      acc[specie.name] = specie.residents.length;
-      return acc;
-    }, {});
-  }
+const findAnimal = (animal) => species.find((specie) => specie.name === animal.specie);
 
-  const targetSpecies = species.find((target) => target.name === animal.specie);
-  const filtraPorSexo = targetSpecies.residents.filter(
-    (anmlSex) => anmlSex.sex === animal.sex,
-  );
-  if (animal.sex) {
-    return filtraPorSexo.length;
-  }
-  return targetSpecies.residents.length;
-}
+const filterBySex = (obj, animal) => obj.residents
+  .filter((resident) => resident.sex === animal.sex).length;
 
-// console.log(countAnimals({ specie: 'penguins' }))
-// console.log(countAnimals({ specie: 'penguins', sex: 'female' }))
-// console.log(countAnimals({ specie: 'penguins', sex: 'male' }))
-console.log(countAnimals());
+const handleEmptyParam = () => species
+  .reduce((acc, specie) => ({ ...acc, [specie.name]: specie.residents.length }), {});
+
+const countAnimals = (animal = 0) => {
+  if (!animal) { return handleEmptyParam(); }
+  const specieObj = findAnimal(animal);
+  const residentSum = findAnimal(animal).residents.length;
+  const filteredBySex = filterBySex(specieObj, animal);
+  if (animal.sex) { return filteredBySex; }
+  return residentSum;
+};
 
 module.exports = countAnimals;
