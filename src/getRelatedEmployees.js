@@ -6,11 +6,11 @@ const isManager = (id) => employees
 
 function getRelatedEmployees(managerId) {
   // seu código aqui
-  const subordinado = [];
   if (!isManager(managerId)) {
     throw new Error('O id inserido não é de uma pessoa colaboradora gerente!');
   }
   try {
+    const subordinado = [];
     employees.forEach((person) => {
       if (person.managers.includes(managerId)) {
         subordinado.push(`${person.firstName} ${person.lastName}`);
