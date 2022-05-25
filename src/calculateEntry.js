@@ -7,7 +7,6 @@ const isParamEmpty = (entrants) => {
 
 function countEntrants(entrants = 0) {
   // seu código aqui
-  if (isParamEmpty(entrants)) { return 0; }
   const entrantsCollection = { child: 0, adult: 0, senior: 0 };
   entrants.forEach(({ age }) => {
     if (age < 18) {
@@ -23,7 +22,7 @@ function countEntrants(entrants = 0) {
 
 function calculateEntry(entrants = 0) {
   // seu código aqui
-  if (Object.values(entrants).length === 0) { return 0; }
+  if (isParamEmpty(entrants)) { return 0; }
   const { child, adult, senior } = countEntrants(entrants);
   const childFare = child * prices.child;
   const adultFare = adult * prices.adult;
