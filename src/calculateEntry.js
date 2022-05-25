@@ -2,7 +2,7 @@ const { prices } = require('../data/zoo_data');
 const data = require('../data/zoo_data');
 
 const isParamEmpty = (entrants) => {
-  if (entrants === 0 || Object.values(entrants).length === 0) { return true; }
+  if (!entrants || !Object.values(entrants).length) { return true; }
 };
 
 function countEntrants(entrants = 0) {
@@ -24,10 +24,10 @@ function countEntrants(entrants = 0) {
 function calculateEntry(entrants = 0) {
   // seu código aqui
   if (Object.values(entrants).length === 0) { return 0; }
-  const guests = countEntrants(entrants);
-  const childFare = guests.child * prices.child;
-  const adultFare = guests.adult * prices.adult;
-  const seniorFare = guests.senior * prices.senior;
+  const { child, adult, senior } = countEntrants(entrants);
+  const childFare = child * prices.child;
+  const adultFare = adult * prices.adult;
+  const seniorFare = senior * prices.senior;
   return childFare + adultFare + seniorFare;
 }
 
