@@ -3,8 +3,7 @@ const data = require('../data/zoo_data');
 
 const isManager = (id) => employees.some((employee) => employee.managers.includes(id));
 
-function getRelatedEmployees(managerId) {
-  // seu código aqui
+const getRelatedEmployees = (managerId) => {
   if (!isManager(managerId)) {
     throw new Error('O id inserido não é de uma pessoa colaboradora gerente!');
   }
@@ -19,6 +18,6 @@ function getRelatedEmployees(managerId) {
   } catch (err) {
     return err.message;
   }
-}
+};
 
 module.exports = { isManager, getRelatedEmployees };
