@@ -5,89 +5,51 @@ const locations = ['NE', 'NW', 'SE', 'SW'];
 const findSpeciesByLocation = (location) => species
   .filter((animal) => animal.location === location);
 
+const generateMap = (callback) => locations
+  .reduce((acc, cur) => ({ ...acc, [cur]: callback(cur) }), {});
+
 const returnAnimalNames = (location) => findSpeciesByLocation(location)
   .map((animal) => animal.name);
-
-let mapSpeciesObj = {};
-
-locations.forEach((location) => {
-  mapSpeciesObj = { ...mapSpeciesObj, [location]: returnAnimalNames(location) };
-  return mapSpeciesObj;
-});
-
-const mapResidents = (location) => findSpeciesByLocation(location)
-  .map((animal) => ({ [animal.name]: animal.residents.map((resident) => resident.name) }));
-
-let mapResidentsObj = {};
-
-locations.forEach((location) => {
-  mapResidentsObj = { ...mapResidentsObj, [location]: mapResidents(location) };
-  return mapResidentsObj;
-});
-
-let mapResidentsSortedObj = {};
+const speciesMap = generateMap(returnAnimalNames);
 
 const mapResidentsSorted = (location) => findSpeciesByLocation(location)
   .map((animal) => ({ [animal.name]: animal.residents.map((resident) => resident.name).sort() }));
+const sortedMap = generateMap(mapResidentsSorted);
 
-locations.forEach((location) => {
-  mapResidentsSortedObj = { ...mapResidentsSortedObj, [location]: mapResidentsSorted(location) };
-  return mapResidentsSortedObj;
-});
+const mapResidents = (location) => findSpeciesByLocation(location)
+  .map((animal) => ({ [animal.name]: animal.residents.map((resident) => resident.name) }));
+const genericMap = generateMap(mapResidents);
 
-let mapResidentsSex = {};
-
-const filterBySexInnerFunction = (obj, sex) => obj.residents
+const sexFilter = (obj, sex) => obj.residents
   .filter(((resident) => resident.sex === sex))
   .map((resident) => resident.name);
-
 const mapResidentsSexObj = (location, sex) => findSpeciesByLocation(location)
-  .map((animal) => ({ [animal.name]: filterBySexInnerFunction(animal, sex) }));
-
-const filterBySex2 = (sex) => {
-  locations.forEach((location) => {
-    mapResidentsSex = { ...mapResidentsSex, [location]: mapResidentsSexObj(location, sex) };
-    return mapResidentsSex;
-  });
-};
-
-let mapResidentsSexSortedObj = {};
+  .map((animal) => ({ [animal.name]: sexFilter(animal, sex) }));
+const filterSex = (sex) => locations
+  .reduce((acc, cur) => ({ ...acc, [cur]: mapResidentsSexObj(cur, sex) }), {});
 
 const filterBySexSortedInnerFunction = (obj, sex) => obj.residents
   .filter(((resident) => resident.sex === sex)).map((resident) => resident.name).sort();
-
 const mapResidentsSortedSexObj = (location, sex) => findSpeciesByLocation(location)
   .map((animal) => ({ [animal.name]: filterBySexSortedInnerFunction(animal, sex) }));
+const filterSexSorted = (sex) => locations
+  .reduce((acc, cur) => ({ ...acc, [cur]: mapResidentsSortedSexObj(cur, sex) }), {});
 
-const filterBySexSorted2 = (sex) => {
-  locations.forEach((location) => {
-    mapResidentsSexSortedObj = {
-      ...mapResidentsSexSortedObj, [location]: mapResidentsSortedSexObj(location, sex),
-    };
-    return mapResidentsSexSortedObj;
-  });
-};
-
-const isParamValid = (options) => {
-  if (Object.keys(options).length === 0) { return true; }
+const isParamInvalid = (options) => {
+  if (!Object.keys(options).length) { return true; }
   return false;
 };
 
-const isEmpty = (options = {}) => !options.includeNames || isParamValid(options);
+const isEmpty = (options = {}) => !options.includeNames || isParamInvalid(options);
 
 const areAllTrue = (options) => options.includeNames && options.sex && options.sorted;
 
 function getAnimalMap(options = {}) {
-  // seu código aqui
-  console.log(options);
-  if (isEmpty(options)) { console.log('FFF ou TFF'); return mapSpeciesObj; }
-  if (areAllTrue(options)) {
-    console.log('TTT'); filterBySexSorted2(options.sex);
-    return mapResidentsSexSortedObj;
-  }
-  if (options.sex) { console.log('TTF'); filterBySex2(options.sex); return mapResidentsSex; }
-  if (options.sorted) { console.log('TFT'); return mapResidentsSortedObj; }
-  return mapResidentsObj; // (TFF)
+  if (isEmpty(options)) { return speciesMap; }
+  if (areAllTrue(options)) { return filterSexSorted(options.sex); }
+  if (options.sex) { return filterSex(options.sex); }
+  if (options.sorted) { return sortedMap; }
+  return genericMap;
 }
 
 module.exports = getAnimalMap;
