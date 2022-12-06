@@ -45,4 +45,6 @@ function getSchedule(scheduleTarget) {
   return functionamento;
 }
 
+getSchedule();
+
 module.exports = getSchedule;

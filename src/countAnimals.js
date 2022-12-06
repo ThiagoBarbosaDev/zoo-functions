@@ -12,9 +12,9 @@ const handleEmptyParam = () => species
 const countAnimals = (animal = 0) => {
   if (!animal) { return handleEmptyParam(); }
   const specieObj = findAnimal(animal);
-  const residentSum = findAnimal(animal).residents.length;
   const filteredBySex = filterBySex(specieObj, animal);
   if (animal.sex) { return filteredBySex; }
+  const residentSum = specieObj.residents.length;
   return residentSum;
 };
 
